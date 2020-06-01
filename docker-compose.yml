@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  server:
+    build: ./server
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ./server/:/usr/src/app/
+    ports:
+      - 8002:8000
+
+  client:
+    build:
+      args:
+        - NODE_ENV=development
+        - API_URL=http://192.168.1.14:8002
+      context: client
+      target: development
+    volumes:
+      - ./client/src:/usr/src/app/src
+      - ./client/package.json:/usr/src/package.json
+      - ./client/package-lock.json:/usr/src/package-lock.json
+      - client-notused:/usr/src/node_modules
+    ports:
+      - 5050:5050
+
+volumes:
+  client-notused:
